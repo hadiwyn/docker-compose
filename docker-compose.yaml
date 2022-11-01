@@ -1,0 +1,57 @@
+version: "3.3"
+services:
+  php-apache-environment:
+    container_name: php-apache
+    image: php:7.0-apache
+    volumes:
+      - ${PWD}:/var/www/html/
+    ports:
+      - 9000:80
+    networks:
+      - hadi_net
+  myadmin:
+    image: phpmyadmin:latest
+    container_name: hadi_myadmin
+    hostname: myadmin
+    restart: unless-stopped
+    ports:
+      - 8080:80
+    networks:
+      - hadi_net
+    environment:
+      - PMA_HOST=hadi_mariadb
+
+  db:
+    image: "mariadb:10.3"
+    container_name: hadi_mariadb
+    domainname: dboprek.com
+    hostname: db
+    restart: unless-stopped
+    networks:
+      - hadi_net
+    command:
+      - mysqld
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max_connections=200
+      - --max_heap_table_size=256M
+      - --max_allowed_packet=32M
+      - --tmp_table_size=256M
+      - --join_buffer_size=512M
+      - --innodb_buffer_pool_size=4G
+      - --innodb_doublewrite=OFF
+      - --innodb_flush_log_at_timeout=3
+      - --innodb_read_io_threads=32
+      - --innodb_write_io_threads=16
+      - --innodb_buffer_pool_instances=40
+      - --innodb_file_format=Barracuda
+      - --innodb_large_prefix=1
+      - --innodb_io_capacity=5000
+      - --innodb_io_capacity_max=10000
+    environment:
+      - MYSQL_ROOT_PASSWORD=MyPassword!
+      - TZ=Asia/Jakarta
+
+networks:
+  hadi_net:
+    external: true
